@@ -1,1 +1,50 @@
+# Week 2 — Core network + firewall deployment
 
+## Objective
+Deploy and configure the two-firewall architecture: Palo Alto as the internet-facing
+edge firewall, and FortiGate as the secure-facing internal firewall.
+
+## Palo Alto (internet-facing)
+
+**1. Interface configuration**
+- Ethernet1/1 (Outside/WAN) — `157.201.22.122/29`, VLAN 616, gateway `157.201.22.121`
+- Ethernet1/3 subinterface (DMZ) — `192.168.17.1/24`, VLAN 716
+- Interconnect interface — `192.168.18.1/24`, transit link to FortiGate
+- MGT port — `10.1.47.16`, gateway `10.1.47.1`, VLAN 47 (out-of-band management)
+
+**2. Zone configuration**
+Mapped each interface to a security zone: Outside, DMZ, Interconnect, Management.
+
+**3. Static routes**
+Route from the Interconnect interface toward FortiGate's Interconnect leg
+(`192.168.18.2/24`) so traffic can reach the Inside/Secure zones downstream.
+
+**4. Security policies**
+Baseline zone-to-zone rules — Outside → DMZ (web traffic to Web1/Web2/Guacamole),
+DMZ/Outside → Interconnect (traffic destined for internal zones).
+
+## FortiGate (secure-facing)
+
+**1. Interface configuration**
+- Interconnect (uplink to Palo Alto) — `192.168.18.2/24`
+- Inside — `192.168.19.1/24`, VLAN 816
+- Secure — `192.168.16.1/24`, VLAN 916
+
+**2. VDOM configuration**
+[TODO: document VDOM setup if used]
+
+**3. Static routes**
+Route back toward Palo Alto's Interconnect leg for return traffic to Outside/DMZ.
+
+**4. Security policies**
+Baseline rules governing Interconnect → Inside/Secure and Inside ↔ Secure traffic.
+
+## Deliverables
+- [ ] Palo Alto interface config screenshot
+- [ ] Palo Alto zone list screenshot
+- [ ] Palo Alto static route table screenshot
+- [ ] Palo Alto security policy rulebase screenshot
+- [ ] FortiGate interface config screenshot
+- [ ] FortiGate VDOM config screenshot
+- [ ] FortiGate static route table screenshot
+- [ ] FortiGate security policy rulebase screenshot
